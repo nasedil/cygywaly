@@ -1,8 +1,11 @@
-from math import copysign
+from collections import deque
+from math import copysign, atan2, sqrt
 from random import uniform, randint
 
 import pygame
 import pygame.gfxdraw
+from math import cos
+from math import sin
 
 STAR_DENSITY = 100
 OBSTACLE_DENSITY = 1
@@ -20,6 +23,7 @@ class Creature(object):
         self.speed_y = 0
         self.lift = 0
         self.push = 0
+        self.tail = deque(maxlen=10)
 
 class World(object):
     def __init__(self, length, difficulty):
@@ -48,12 +52,21 @@ class World(object):
     def proceed(self, delta):
         self.hero.y += self.hero.speed_y * delta
         self.hero.x += self.hero.speed_x * delta
+        self.hero.speed_x = max(0, self.hero.speed_x)
         self.hero.speed_x += self.hero.push * delta
         self.hero.speed_y += (self.hero.lift - self.gravity) * delta
         self.hero.lift = max(0, self.hero.lift-5*delta)
         self.hero.push = copysign(max(0, abs(self.hero.push)-0.19*delta), self.hero.push)
+        self.hero.tail.append(atan2(self.hero.speed_y, self.hero.speed_x))
 
-        self.is_hit = self.is_hit or self.test_hit()
+        if self.is_hit:
+            return
+
+        self.is_hit = self.test_hit()
+        if self.is_hit:
+            self.hero.lift = 0
+            self.hero.push = -1
+            self.hero.speed_y *= -1
 
     def test_hit(self):
         for obstacle in self.obstacles:
@@ -83,6 +96,13 @@ class World(object):
         y = self.hero.y + (VIEW_HEIGHT / 2)
         color = "red" if self.is_hit else "magenta"
         pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), self.hero.size*scale)
+        radius = self.hero.size
+        stretch = 0.1 + sqrt(self.hero.push ** 2 + (self.hero.lift - self.gravity) ** 2) / 1.7 + sqrt(self.hero.speed_x ** 2 + self.hero.speed_y ** 2) / 2.5
+        for angle in self.hero.tail:
+            x = x - radius * cos(angle) * stretch
+            y = y - radius * sin(angle) * stretch
+            radius /= 2
+            pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
 
         color = (50, 60, 20)
         for obstacle in self.obstacles:
