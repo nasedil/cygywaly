@@ -17,7 +17,7 @@ VIEW_WIDTH = 2
 class Creature(object):
     def __init__(self, size):
         self.size = size
-        self.x = 0
+        self.x = -1
         self.y = 0
         self.speed_x = 0.03
         self.speed_y = 0
@@ -67,6 +67,7 @@ class World(object):
             self.hero.lift = 0
             self.hero.push = -1
             self.hero.speed_y *= -1
+            self.hero.speed_x *= 0
 
     def test_hit(self):
         for obstacle in self.obstacles:

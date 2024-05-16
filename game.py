@@ -22,13 +22,15 @@ while running:
     world.draw(screen)
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_ESCAPE]:
+        running = False
+    if keys[pygame.K_UP] and not world.is_hit:
         world.hero.lift = 2.2
     if keys[pygame.K_DOWN]:
-        pass
-    if keys[pygame.K_LEFT]:
+        world.hero.lift /= 2
+    if keys[pygame.K_LEFT] and not world.is_hit:
         world.hero.push = -world.hero.speed_x / 4
-    if keys[pygame.K_RIGHT]:
+    if keys[pygame.K_RIGHT] and not world.is_hit:
         world.hero.push = 0.2
 
     # flip() the display to put your work on screen
