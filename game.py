@@ -9,11 +9,7 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 
-world = World(10, 1)
-
-position_x = 0
-speed = 0.9
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+world = World(100, 1)
 
 while running:
     # poll for events
@@ -26,23 +22,22 @@ while running:
     screen.fill("black")
 
     # RENDER YOUR GAME HERE
-    world.draw(screen, position_x)
-    pygame.draw.circle(screen, "red", player_pos, 40)
+    world.draw(screen)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP]:
-        player_pos.y -= 3 * speed
+        world.hero.lift = 2.2
     if keys[pygame.K_DOWN]:
-        player_pos.y += 3 * speed
+        pass
     if keys[pygame.K_LEFT]:
-        player_pos.x -= 3 * speed
+        world.hero.push = -world.hero.speed_x / 4
     if keys[pygame.K_RIGHT]:
-        player_pos.x += 3 * speed
+        world.hero.push = 0.2
 
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    delta = clock.tick(60)  # limits FPS to 60
-    position_x += speed * delta / 1000
+    delta = clock.tick_busy_loop(60)  # limits FPS to 60
+    world.proceed(delta / 1000)
 
 pygame.quit()
