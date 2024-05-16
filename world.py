@@ -5,7 +5,7 @@ import pygame
 import pygame.gfxdraw
 
 STAR_DENSITY = 100
-OBSTACLE_DENSITY = 2
+OBSTACLE_DENSITY = 1
 OBSTACLE_SCALE = 0.1
 STAR_RADIUS = 0.005
 HEIGHT = 0.5
@@ -55,6 +55,8 @@ class World(object):
         window_width, window_height = pygame.display.get_window_size()
         scale = window_width / VIEW_WIDTH
         VIEW_HEIGHT = window_height / scale
+
+        surface.fill(self.back_color)
         
         for star in self.back_stars:
             x = (star[0] - self.hero.x) / star[2] + (VIEW_WIDTH / 2)
@@ -67,11 +69,6 @@ class World(object):
             x = (obstacle[0] - self.hero.x) + (VIEW_WIDTH / 2)
             y = obstacle[1] + (VIEW_HEIGHT / 2)
             pygame.draw.circle(surface, "brown", (x*scale, window_height - y*scale), obstacle[2]*scale)
-        
-        y = HEIGHT + (VIEW_HEIGHT / 2)
-        pygame.draw.rect(surface, "brown", (0, 0, window_width, window_height - y*scale))
-        y = -HEIGHT + (VIEW_HEIGHT / 2)
-        pygame.draw.rect(surface, "brown", (0, window_height - y*scale, window_width, window_height))
 
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
@@ -83,3 +80,8 @@ class World(object):
             radius = STAR_RADIUS / star[2]
             color = [i + randint(0, self.blink_range) for i in self.back_stars_color]
             pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
+
+        y = HEIGHT + (VIEW_HEIGHT / 2)
+        pygame.draw.rect(surface, "brown", (0, 0, window_width, window_height - y*scale))
+        y = -HEIGHT + (VIEW_HEIGHT / 2)
+        pygame.draw.rect(surface, "brown", (0, window_height - y*scale, window_width, window_height))

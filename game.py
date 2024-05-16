@@ -18,9 +18,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("black")
-
     # RENDER YOUR GAME HERE
     world.draw(screen)
 
