@@ -5,8 +5,10 @@ import pygame
 import pygame.gfxdraw
 
 STAR_DENSITY = 100
+OBSTACLE_DENSITY = 2
+OBSTACLE_SCALE = 0.1
 STAR_RADIUS = 0.005
-HEIGHT = 1
+HEIGHT = 0.6
 VIEW_WIDTH = 2
 
 class Creature(object):
@@ -27,14 +29,17 @@ class World(object):
         self.back_color = (10, 2, 15)
         self.back_stars_color = [100 for i in range(3)]
         self.blink_range = 30
-        self.generate_world()
+
+        self.back_stars = [(uniform(0, self.length), uniform(-HEIGHT*10, HEIGHT*10), uniform(0.5, 10))
+                           for i in range(int(STAR_DENSITY*self.length))]
+        
+        min_obstacle_size = OBSTACLE_SCALE*self.difficulty * 0.01
+        self.obstacles = [(uniform(0, self.length), uniform(-HEIGHT*1, HEIGHT*1), uniform(min_obstacle_size, OBSTACLE_SCALE*self.difficulty))
+                           for i in range(int(self.difficulty*OBSTACLE_DENSITY*self.length))]
+
         self.gravity = 1
 
         self.hero = Creature(size=0.1)
-
-    def generate_world(self):
-        self.back_stars = [(uniform(0, self.length), uniform(-HEIGHT*10, HEIGHT*10), uniform(0.5, 10))
-                           for i in range(int(STAR_DENSITY*self.length))]
         
     def proceed(self, delta):
         self.hero.y += self.hero.speed_y * delta
@@ -55,6 +60,11 @@ class World(object):
             color = [i + randint(0, self.blink_range) for i in self.back_stars_color]
             pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
         
+        for obstacle in self.obstacles:
+            x = (obstacle[0] - self.hero.x) + (VIEW_WIDTH / 2)
+            y = obstacle[1] + (VIEW_HEIGHT / 2)
+            pygame.draw.circle(surface, "yellow", (x*scale, window_height - y*scale), obstacle[2]*scale)
+
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
         pygame.draw.circle(surface, "magenta", (x*scale, window_height - y*scale), self.hero.size*scale)
