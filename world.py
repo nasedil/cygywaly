@@ -8,7 +8,7 @@ STAR_DENSITY = 100
 OBSTACLE_DENSITY = 2
 OBSTACLE_SCALE = 0.1
 STAR_RADIUS = 0.005
-HEIGHT = 0.6
+HEIGHT = 0.5
 VIEW_WIDTH = 2
 
 class Creature(object):
@@ -63,7 +63,12 @@ class World(object):
         for obstacle in self.obstacles:
             x = (obstacle[0] - self.hero.x) + (VIEW_WIDTH / 2)
             y = obstacle[1] + (VIEW_HEIGHT / 2)
-            pygame.draw.circle(surface, "yellow", (x*scale, window_height - y*scale), obstacle[2]*scale)
+            pygame.draw.circle(surface, "brown", (x*scale, window_height - y*scale), obstacle[2]*scale)
+        
+        y = HEIGHT + (VIEW_HEIGHT / 2)
+        pygame.draw.rect(surface, "brown", (0, 0, window_width, window_height - y*scale))
+        y = -HEIGHT + (VIEW_HEIGHT / 2)
+        pygame.draw.rect(surface, "brown", (0, window_height - y*scale, window_width, window_height))
 
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
