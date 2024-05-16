@@ -42,6 +42,8 @@ class World(object):
         self.gravity = 1
 
         self.hero = Creature(size=0.1)
+
+        self.is_hit = False
         
     def proceed(self, delta):
         self.hero.y += self.hero.speed_y * delta
@@ -50,6 +52,18 @@ class World(object):
         self.hero.speed_y += (self.hero.lift - self.gravity) * delta
         self.hero.lift = max(0, self.hero.lift-5*delta)
         self.hero.push = copysign(max(0, abs(self.hero.push)-0.19*delta), self.hero.push)
+
+        self.is_hit = self.is_hit or self.test_hit()
+
+    def test_hit(self):
+        for obstacle in self.obstacles:
+            if ((self.hero.x - obstacle[0]) ** 2 + (self.hero.y - obstacle[1]) ** 2) < (obstacle[2] + self.hero.size) ** 2:
+                self.is_hit = True
+                return True
+        if abs(self.hero.y) + self.hero.size > HEIGHT:
+            self.is_hit = True
+            return True
+        return False
 
     def draw(self, surface):
         window_width, window_height = pygame.display.get_window_size()
@@ -64,15 +78,17 @@ class World(object):
             radius = STAR_RADIUS / star[2]
             color = [i + randint(0, self.blink_range) for i in self.back_stars_color]
             pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
-        
-        for obstacle in self.obstacles:
-            x = (obstacle[0] - self.hero.x) + (VIEW_WIDTH / 2)
-            y = obstacle[1] + (VIEW_HEIGHT / 2)
-            pygame.draw.circle(surface, "brown", (x*scale, window_height - y*scale), obstacle[2]*scale)
 
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
-        pygame.draw.circle(surface, "magenta", (x*scale, window_height - y*scale), self.hero.size*scale)
+        color = "red" if self.is_hit else "magenta"
+        pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), self.hero.size*scale)
+
+        color = (50, 60, 20)
+        for obstacle in self.obstacles:
+            x = (obstacle[0] - self.hero.x) + (VIEW_WIDTH / 2)
+            y = obstacle[1] + (VIEW_HEIGHT / 2)
+            pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), obstacle[2]*scale)
 
         for star in self.front_stars:
             x = (star[0] - self.hero.x) / star[2] + (VIEW_WIDTH / 2)
@@ -81,7 +97,8 @@ class World(object):
             color = [i + randint(0, self.blink_range) for i in self.back_stars_color]
             pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
 
+        color = (50, 60, 20)
         y = HEIGHT + (VIEW_HEIGHT / 2)
-        pygame.draw.rect(surface, "brown", (0, 0, window_width, window_height - y*scale))
+        pygame.draw.rect(surface, color, (0, 0, window_width, window_height - y*scale))
         y = -HEIGHT + (VIEW_HEIGHT / 2)
-        pygame.draw.rect(surface, "brown", (0, window_height - y*scale, window_width, window_height))
+        pygame.draw.rect(surface, color, (0, window_height - y*scale, window_width, window_height))
