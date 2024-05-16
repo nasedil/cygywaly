@@ -1,16 +1,18 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 
+from world import World
+
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 
-width, height = pygame.display.get_window_size()
-print(width, height)
+world = World(10, 1)
 
-speed = 1
+position_x = 0
+speed = 0.9
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 while running:
@@ -24,6 +26,7 @@ while running:
     screen.fill("black")
 
     # RENDER YOUR GAME HERE
+    world.draw(screen, position_x)
     pygame.draw.circle(screen, "red", player_pos, 40)
 
     keys = pygame.key.get_pressed()
@@ -39,6 +42,7 @@ while running:
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    delta = clock.tick(60)  # limits FPS to 60
+    position_x += speed * delta / 1000
 
 pygame.quit()
