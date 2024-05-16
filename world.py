@@ -30,10 +30,12 @@ class World(object):
         self.back_stars_color = [100 for i in range(3)]
         self.blink_range = 30
 
-        self.back_stars = [(uniform(0, self.length), uniform(-HEIGHT*10, HEIGHT*10), uniform(0.5, 10))
+        self.back_stars = [(uniform(0, self.length), uniform(-HEIGHT*10, HEIGHT*10), uniform(1, 10))
+                           for i in range(int(STAR_DENSITY*self.length))]
+        self.front_stars = [(uniform(0, self.length), uniform(-HEIGHT*10, HEIGHT*10), uniform(0.5, 1))
                            for i in range(int(STAR_DENSITY*self.length))]
         
-        min_obstacle_size = OBSTACLE_SCALE*self.difficulty * 0.01
+        min_obstacle_size = OBSTACLE_SCALE*self.difficulty * 0.1
         self.obstacles = [(uniform(0, self.length), uniform(-HEIGHT*1, HEIGHT*1), uniform(min_obstacle_size, OBSTACLE_SCALE*self.difficulty))
                            for i in range(int(self.difficulty*OBSTACLE_DENSITY*self.length))]
 
@@ -53,6 +55,7 @@ class World(object):
         window_width, window_height = pygame.display.get_window_size()
         scale = window_width / VIEW_WIDTH
         VIEW_HEIGHT = window_height / scale
+        
         for star in self.back_stars:
             x = (star[0] - self.hero.x) / star[2] + (VIEW_WIDTH / 2)
             y = star[1] / star[2] + (VIEW_HEIGHT / 2)
@@ -73,3 +76,10 @@ class World(object):
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
         pygame.draw.circle(surface, "magenta", (x*scale, window_height - y*scale), self.hero.size*scale)
+
+        for star in self.front_stars:
+            x = (star[0] - self.hero.x) / star[2] + (VIEW_WIDTH / 2)
+            y = star[1] / star[2] + (VIEW_HEIGHT / 2)
+            radius = STAR_RADIUS / star[2]
+            color = [i + randint(0, self.blink_range) for i in self.back_stars_color]
+            pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
