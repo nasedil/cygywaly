@@ -10,7 +10,7 @@ from math import sin
 
 STAR_DENSITY = 100
 OBSTACLE_DENSITY = 1
-OBSTACLE_SCALE = 0.1
+OBSTACLE_SCALE = 0.05
 STAR_RADIUS = 0.005
 HEIGHT = 0.5
 VIEW_WIDTH = 2
@@ -47,9 +47,11 @@ class World(object):
 
         self.gravity = 1
 
-        self.hero = Creature(size=0.07)
+        self.hero = Creature(size=0.06)
 
         self.is_hit = False
+        self.dead = False
+        self.finished = False
         
     def proceed(self, delta):
         self.hero.y += self.hero.speed_y * delta
@@ -70,6 +72,12 @@ class World(object):
             speed = uniform(0.1, 0.5)
             self.hero.blood.append([self.hero.x, self.hero.y, cos(angle)*speed, sin(angle)*speed])
             return
+        
+        if self.hero.y < -HEIGHT:
+            self.dead = True
+
+        if self.hero.x > self.length:
+            self.finished = True
 
         self.is_hit = self.test_hit()
         if self.is_hit:

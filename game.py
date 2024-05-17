@@ -9,12 +9,18 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 
-world = World(100, 1)
+level = 1
+lost = False
+world = None
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    if not world or world.finished:
+        world = World(10 + 5 * level, level)
+        level += 0.1
 
     world.draw(screen)
 
@@ -29,6 +35,9 @@ while running:
         world.hero.push = -world.hero.speed_x / 4
     if keys[pygame.K_RIGHT] and not world.is_hit:
         world.hero.push = 0.2
+
+    if world.dead:
+        lost = True
 
     pygame.display.flip()
 
