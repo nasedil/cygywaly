@@ -13,16 +13,20 @@ level = 1
 lost = False
 world = None
 
+font = pygame.font.SysFont('sans', 30)
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
     if not world or world.finished:
-        world = World(10 + 5 * level, level)
-        level += 0.1
+        world = World(10 + 5 * level/10, level)
+        message = font.render('Level ' + str(level), True, 'white', None)
+        level += 1
 
     world.draw(screen)
+    screen.blit(message, (0, 0))
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_ESCAPE]:
