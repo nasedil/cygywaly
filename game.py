@@ -12,13 +12,10 @@ running = True
 world = World(100, 1)
 
 while running:
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # RENDER YOUR GAME HERE
     world.draw(screen)
 
     keys = pygame.key.get_pressed()
@@ -33,10 +30,9 @@ while running:
     if keys[pygame.K_RIGHT] and not world.is_hit:
         world.hero.push = 0.2
 
-    # flip() the display to put your work on screen
     pygame.display.flip()
 
-    delta = clock.tick_busy_loop(60)  # limits FPS to 60
+    delta = clock.tick_busy_loop(60)
     world.proceed(delta / 1000)
 
 pygame.quit()

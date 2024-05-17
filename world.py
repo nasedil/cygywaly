@@ -1,4 +1,5 @@
 from collections import deque
+import math
 from math import copysign, atan2, sqrt
 from random import uniform, randint
 
@@ -24,6 +25,7 @@ class Creature(object):
         self.lift = 0
         self.push = 0
         self.tail = deque(maxlen=10)
+        self.blood = []
 
 class World(object):
     def __init__(self, length, difficulty):
@@ -39,7 +41,7 @@ class World(object):
         self.front_stars = [(uniform(0, self.length), uniform(-HEIGHT*10, HEIGHT*10), uniform(0.5, 1))
                            for i in range(int(STAR_DENSITY*self.length))]
         
-        min_obstacle_size = OBSTACLE_SCALE*self.difficulty * 0.1
+        min_obstacle_size = OBSTACLE_SCALE*self.difficulty * 0.2
         self.obstacles = [(uniform(0, self.length), uniform(-HEIGHT*1, HEIGHT*1), uniform(min_obstacle_size, OBSTACLE_SCALE*self.difficulty))
                            for i in range(int(self.difficulty*OBSTACLE_DENSITY*self.length))]
 
@@ -60,6 +62,13 @@ class World(object):
         self.hero.tail.append(atan2(self.hero.speed_y, self.hero.speed_x))
 
         if self.is_hit:
+            for blood_drop in self.hero.blood:
+                blood_drop[1] += blood_drop[3] * delta
+                blood_drop[0] += blood_drop[2] * delta
+                blood_drop[1] -= self.gravity * delta
+            angle = uniform(0, math.pi*2)
+            speed = uniform(0.1, 0.5)
+            self.hero.blood.append([self.hero.x, self.hero.y, cos(angle)*speed, sin(angle)*speed])
             return
 
         self.is_hit = self.test_hit()
@@ -95,7 +104,7 @@ class World(object):
 
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
-        color = "red" if self.is_hit else "magenta"
+        color = "purple" if self.is_hit else "magenta"
         pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), self.hero.size*scale)
         radius = self.hero.size
         stretch = 0.1 + sqrt(self.hero.push ** 2 + (self.hero.lift - self.gravity) ** 2) / 1.7 + sqrt(self.hero.speed_x ** 2 + self.hero.speed_y ** 2) / 2.5
@@ -104,6 +113,10 @@ class World(object):
             y = y - radius * sin(angle) * stretch
             radius /= 2
             pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), radius*scale)
+        for blood_drop in self.hero.blood:
+            x = blood_drop[0] - self.hero.x + (VIEW_WIDTH / 2)
+            y = blood_drop[1] + (VIEW_HEIGHT / 2)
+            pygame.draw.circle(surface, "red", (x*scale, window_height - y*scale), self.hero.size*scale/10)
 
         color = (50, 60, 20)
         for obstacle in self.obstacles:
