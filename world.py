@@ -47,7 +47,7 @@ class World(object):
 
         self.gravity = 1
 
-        self.hero = Creature(size=0.1)
+        self.hero = Creature(size=0.07)
 
         self.is_hit = False
         
@@ -104,7 +104,7 @@ class World(object):
 
         x = VIEW_WIDTH / 2
         y = self.hero.y + (VIEW_HEIGHT / 2)
-        color = "purple" if self.is_hit else "magenta"
+        color = [200, 110, 180] if self.is_hit else [180, 110, 220]
         pygame.draw.circle(surface, color, (x*scale, window_height - y*scale), self.hero.size*scale)
         radius = self.hero.size
         stretch = 0.1 + sqrt(self.hero.push ** 2 + (self.hero.lift - self.gravity) ** 2) / 1.7 + sqrt(self.hero.speed_x ** 2 + self.hero.speed_y ** 2) / 2.5
